@@ -34,6 +34,7 @@ async function getAllStudentsOfSpecialization (req:Request, res:Response){
  //We add a student to the DB
 async function addStudent(req:Request,res:Response){
     console.log('Adding new Student');
+    console.log(req.body);
     const name = req.body.name;
     const address = req.body.address;
     const phones = req.body.phones;
@@ -49,31 +50,12 @@ async function addStudent(req:Request,res:Response){
 }
 
 async function addStudentToSubj (req:Request, res:Response){
-    const name = req.body.name;
+    const idStudent = req.body._id;
     const subject = req.body.subject;
-    console.log('Adding : '+name+' to subj: '+subject);
-    var idStudent : String = '';
-    await Student.findOne(({name: name}),(err,doc)=>{
-        if(!err)
-        {
-         idStudent = doc?._id;
-        }
-        else
-        {
-         res.status(404);
-         console.log('ID not found')
-        }
-    })
-    console.log('This is the ID of the subject that we want to add: '+idStudent)
-    if(idStudent == '')
-    {
-        res.status(404);
-    }
-    else
-    {
-        console.log('We have the id we are trying to add');
-        var query = Subject.update({'name': subject},{$push : {"students":idStudent}});
-        query.exec(function (err, result) {
+    console.log('Adding this user  : '+idStudent+' to subj: '+subject);
+    console.log('We  are trying to add the Student to the Subject');
+    var query = Subject.update({'name': subject},{$push : {"students":idStudent}});
+    query.exec(function (err, result) {
             if (err)
             {
                 res.status(404);
@@ -82,27 +64,5 @@ async function addStudentToSubj (req:Request, res:Response){
                 res.status(200).json(result);
                 console.log('User added to the Subject')
             });   
-    }
-
 }
-
-async function getIdStudent(name:String, res: String){
-    console.log('Finding ID of: '+name)
-    const nameSearch: String = name;
-    await Student.findOne(({name:nameSearch}),(err,doc)=>{
-        if(!err)
-        {
-         var idStudent : String = doc?._id;
-         res = idStudent;
-         console.log('ID STUDENT: '+idStudent);
-        }
-        else
-        {
-         console.log('ID not found')
-         res = '';
-        }
-    })
-
-}
-
 export default {getAllStudents,getAllStudentsOfSpecialization,addStudent,addStudentToSubj}
